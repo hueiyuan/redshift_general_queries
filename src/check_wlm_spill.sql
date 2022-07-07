@@ -1,5 +1,5 @@
 /**********************************************************************************************
-the query can check wlm whether have spell throught is_diskbased, blocks_to_disk and max_blocks_to_disk fields
+the query can check wlm whether have disk spill throught is_diskbased, blocks_to_disk and max_blocks_to_disk fields
 
 ## WLM service class ids ## 
 |     ID     |                       Service Class                                  |
