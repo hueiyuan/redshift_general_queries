@@ -15,7 +15,7 @@ Reference: https://docs.aws.amazon.com/redshift/latest/dg/cm-c-wlm-system-tables
 
 **********************************************************************************************/
 
-select s2.service_class, 
+SELECT s2.service_class, 
       s2.service_class_name, 
       s2.blocks_to_disk, 
       s2.max_blocks_to_disk, 
@@ -25,7 +25,7 @@ select s2.service_class,
       s1.workmem, 
       s1.label, 
       s1.is_diskbased
-from svl_query_summary as s1
-join stl_query_metrics s2 on s1.query=s2.query
-order by workmem desc;
+FROM svl_query_summary AS s1
+JOIN stl_query_metrics s2 ON s1.query=s2.query
+ORDER BY workmem DESC;
 
