@@ -37,24 +37,24 @@ SELECT trim(u.usename) AS user,
         substring(replace(nvl(qrytext_cur.text,trim(translate(s.text,chr(10)||chr(13)||chr(9) ,''))),'\\n',' '),1,90) AS sql,
         trim(decode(event&1,1,'SK ','') || decode(event&2,2,'Del ','') || decode(event&4,4,'NL ','') ||  decode(event&8,8,'Dist ','') || decode(event&16,16,'BcASt ','') || decode(event&32,32,'Stats ','')) AS Alert
 FROM  stv_wlm_query_state q 
-LEFT OUTER JOin stl_querytext s ON (s.query=q.query AND sequence = 0)
-LEFT OUTER JOin stv_query_metrics m ON ( q.query = m.query AND m.segment=-1 AND m.step=-1 )
-LEFT OUTER JOin stv_query_metrics m2 ON ( q.query = m2.query AND m2.step_type = 38 )
-LEFT OUTER JOin ( 
+LEFT OUTER JOIN stl_querytext s ON (s.query=q.query AND sequence = 0)
+LEFT OUTER JOIN stv_query_metrics m ON ( q.query = m.query AND m.segment=-1 AND m.step=-1 )
+LEFT OUTER JOIN stv_query_metrics m2 ON ( q.query = m2.query AND m2.step_type = 38 )
+LEFT OUTER JOIN ( 
     SELECT query, sum(rows) AS rows 
     FROM stv_query_metrics m3 
     WHERE step_type = 15 
     GROUP BY 1
 ) AS m3 ON ( q.query = m3.query )
-LEFT OUTER JOin pg_user u ON ( s.userid = u.usesysid )
-LEFT OUTER JOin (
+LEFT OUTER JOIN pg_user u ON ( s.userid = u.usesysid )
+LEFT OUTER JOIN (
     SELECT ut.xid,'CURSOR ' || TRIM( substring ( TEXT FROM strpos(upper(TEXT),'SELECT') )) AS TEXT
     FROM stl_utilitytext ut
     WHERE sequence = 0 AND upper(TEXT) LIKE 'DECLARE%'
     GROUP BY text, ut.xid
 ) qrytext_cur ON (q.xid = qrytext_cur.xid)
-LEFT OUTER JOin ( 
-    SELECT query,sum(decode(trim(split_part(event,':',1)),'Very SELECTive query filter',1,'Scanned a large number of deleted rows',2,'Nested Loop Join in the query plan',4,'Distributed a large number of rows across the network',8,'BroadcASted a large number of rows across the network',16,'Missing query planner statistics',32,0)) AS event 
+LEFT OUTER JOIN ( 
+    SELECT query,sum(decode(trim(split_part(event,':',1)),'Very SELECTive query filter',1,'Scanned a large number of deleted rows',2,'Nested Loop JOIN in the query plan',4,'Distributed a large number of rows across the network',8,'BroadcASted a large number of rows across the network',16,'Missing query planner statistics',32,0)) AS event 
     FROM STL_ALERT_EVENT_LOG 
     WHERE event_time >=  dateadd(hour, -8, current_Date) GROUP BY query  
 ) AS alrt ON alrt.query = q.query
